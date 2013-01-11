@@ -1,0 +1,15 @@
+#!/bin/sh
+# check pacman updates
+# the core of this script resides in
+# /etc/cron.d/hourly/pacman_update
+# and wont work without it.
+# https://github.com/Cloudef/dotfiles-ng/blob/master/%23ARCHCONFIG/bin/pacup
+
+
+_UPDATES_DB="/tmp/.pacman_updates"
+
+main() {
+   [[ -d "$_UPDATES_DB" ]] || return
+   pacman -Qu --dbpath "$_UPDATES_DB" $@
+}
+main "$@"
