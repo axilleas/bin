@@ -1,7 +1,6 @@
 #!/bin/bash
 
 newpkgver="$1"
-arch="uname -m"
 # Link of SHA1SUMS file
 link="ftp://ftp.mozilla.org/pub/firefox/releases/$newpkgver/SHA1SUMS"
 # SHA1SUMS file rename
