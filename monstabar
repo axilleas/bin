@@ -26,7 +26,7 @@ cpu=$(eval $(awk '/^cpu /{print "previdle=" $5 "; prevtotal=" $2+$3+$4+$5 }' /pr
 vol=$(amixer get Master | egrep -o '[0-9]{1,3}%' | sed -e 's/%//')
 
 # Print \f1%s\fr \br %s \\br %s
-echo "\r \f4\fr $mem MB \f4\fr $vol \f4 $bat" "\c \f5$date" 
+echo "\r \f4\fr $mem \f4\fr $vol \f4 $bat" "\c \f5$date" 
 #echo "\r \f4$mstat\fr $music \f4\\ue09f\fr $root \f4\\ue0b2\fr $home \f4\ue020\fr $mem \f4\\ue05d\fr $vol \f4\ue015\fr $date "
 }
 
