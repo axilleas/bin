@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Simple script to initialize new github project
+
+reponame="$1"
+pwdir=$PWD
+
+cd $HOME/git
+
+mkdir "$reponame"
+cd "$reponame"
+git init
+touch README
+git add README
+git commit -m 'first commit'
+git remote add origin git@github.com:axilleas/"$reponame".git
+git push -u origin master
+
+cd $pwdir
