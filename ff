@@ -1,48 +1,50 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+pushd . >& /dev/null
+cd /tmp
 
 newpkgver="$1"
 # Link of SHA1SUMS file
-link="ftp://ftp.mozilla.org/pub/firefox/releases/$newpkgver/SHA1SUMS"
-# SHA1SUMS file rename
-sha="SHA1SUMS-$newpkgver"
+sha="ftp://ftp.mozilla.org/pub/firefox/releases/$newpkgver/SHA1SUMS"
 
-# Current path
-pwdir=$PWD
-# Path where the PKGBUILD resides
-path="$HOME/aur/firefox-beta-bin"
+curr_ver=`cower -i firefox-beta-bin | grep Version | awk 'BEGIN { FS = " : " } ; { print $2 }'`
+echo "Current version: " $curr_ver
 
-cd $path
-
-echo "Checking if version exists..."
-echo
-wget $link >& /dev/null
+echo "Checking if new version exists..."
+if [ -f SHA1SUMS ]; then rm SHA1SUMS; fi
+wget $sha >& /dev/null
 
 if [ -f SHA1SUMS ]; then
-mv SHA1SUMS SHA1SUMS-$newpkgver
 echo "Version $newpkgver exists. Starting build process."
-echo
 
-# Striping SHA1SUM from downloaded file
-newsha64=`grep -w "linux-x86_64/en-US/firefox-$newpkgver.tar.bz2" $sha | awk 'NR==1{print $1}'`
-newsha32=`grep -w "linux-i686/en-US/firefox-$newpkgver.tar.bz2" $sha | awk 'NR==1{print $1}'`
+echo "Dowloading firefox-beta-bin from AUR..."
 
-# Append old SHA1SUMS to variables
+cower -df firefox-beta-bin -t /tmp
+cd /tmp/firefox-beta-bin
+cp /tmp/SHA1SUMS .
+
+echo 'Striping SHA1SUM from downloaded file...'
+newsha64=`grep -w "linux-x86_64/en-US/firefox-$newpkgver.tar.bz2" SHA1SUMS | awk 'NR==1{print $1}'`
+newsha32=`grep -w "linux-i686/en-US/firefox-$newpkgver.tar.bz2" SHA1SUMS | awk 'NR==1{print $1}'`
+
+echo 'Append old SHA1SUMS to variables...'
 oldsha64=`grep sha1sums PKGBUILD | head -n1 | cut -c 12-51`
 oldsha32=`grep sha1sums PKGBUILD | tail -n1 | cut -c 42-81`
 
 # Old package version
-oldpkgver=`grep pkgver PKGBUILD | head -n1 | cut -c 8-13` 
+oldpkgver=`grep pkgver PKGBUILD | head -n1 | cut -c 8-13`
 
+echo $oldpkgver
 echo "Changing pkgver..."
 sed -i "s/$oldpkgver/$newpkgver/" PKGBUILD
-echo "# old pkgver: $oldpkgver "
-echo "# new pkgver: $newpkgver "  
+echo "# old pkgver: $oldpkgver"
+echo "# new pkgver: $newpkgver "
 sleep 1
 echo
 echo "Changing x86_64 sha1sums..."
 sed -i "s/$oldsha64/$newsha64/" PKGBUILD
 echo "# old sha1sum firefox-x86_64: $oldsha64 "
-echo "# new sha1sum firefox-x86_64: $newsha64 "  
+echo "# new sha1sum firefox-x86_64: $newsha64 "
 sleep 1
 echo
 echo "Changing i686 sha1sums..."
@@ -65,17 +67,17 @@ echo "Uploading to AUR in 2 ..."
 sleep 1
 echo "Uploading to AUR in 1 ..."
 sleep 1
-burp $(echo ${pkgname}-${newpkgver}-${pkgrel}.src.tar.gz) 
+burp $(echo ${pkgname}-${newpkgver}-${pkgrel}.src.tar.gz)
 echo
 echo "Upload complete."
-echo
+echo "Removing firefox-beta-bin folder"
 
+rm -r /tmp/firefox-beta-bin
+
+popd >& /dev/null
 
 sleep 1
 
 else
-echo "Version $newpkgver does not exist. You already have the latest build."
-rm SHA1SUM* 
+echo "Version $newpkgver does not exist or you already have the latest build."
 fi # end of first if
-
-cd $pwdir

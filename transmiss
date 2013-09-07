@@ -3,11 +3,11 @@
 RPORT=9091
 LPORT=9092
 
-ssh -C -c blowfish -f deb -L $LPORT:localhost:$RPORT -N
+ssh -C -c blowfish -f fedbuild -L $LPORT:localhost:$RPORT -N
 
 if [ 'x'$1 == 'x' ];
     then
-        echo "Fuckoff, I won't launch"
+        echo "Connection established"
     else
-        /usr/bin/transgui
+        echo "Connection failed"
 fi
